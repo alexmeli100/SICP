@@ -1,0 +1,35 @@
+#lang racket
+
+(define (make-table) 
+    (let ((local-table (make-tree '() '() '())))
+        (define (look-up key) 
+            (define (helper key table) 
+                (cond ((null? (entry table)) false) 
+                      ((= key (car (entry table))) (cadr (entry table)))
+                      ((< key (car (entry table))) (helper key (left-branch table))) 
+                      ((> key (car (entry table))) (helper key (right-branch table)))))
+            (helper key local-table))
+        (define (insert! key value) 
+            (let ((record (look-up key))) 
+                (if record 
+                    (set-cdr! record value) 
+                    (set! local-table (adjoin-set (cons key value) local-table)))))))
+
+(define (make-tree entry left right) 
+    (list entry left right))
+
+(define (adjoin-set x set) 
+    (cond ((null? set) (make-tree x '() '())) 
+          ((= (car x) (car (entry set))) set) 
+          ((< (car x) (car (entry set))) 
+           (make-tree (entry set) 
+                      (adjoin-set x (left-branch set)) 
+                      (right-branch set))) 
+          ((> (car x) (car (entry set))) 
+           (make-tree (entry set) 
+                      (left-branch set) 
+                      (adjoin-set x (right-branch set)))))) 
+
+(define (entry tree) (car tree))
+(define (left-branch tree) (cadr tree))
+(define (right-branch tree) (caadr tree))

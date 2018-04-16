@@ -1,0 +1,40 @@
+#lang racket 
+
+(define (make-queue) 
+    (let ((front-ptr '() 
+          (rear-ptr '()))) 
+        (define (empty-queue?) 
+            (null? (front-ptr))) 
+        (define (front) 
+            front-ptr)
+        (define (rear) 
+            rear-ptr) 
+        (define (set-front-ptr! x) (set! front-ptr x)) 
+        (define (set-rear-ptr! x) (set! rear-ptr x)) 
+        
+        ;; return front of queue
+        (define (front-queue) 
+            (if (empty-queue?) 
+                (error "FRONT called with an empty queue" front) 
+                (car (front-ptr)))) 
+        ;; insert item in queue
+        (define (insert-queue! item) 
+            (let ((new-pair (cons item '()))) 
+                (cond ((empty-queue?) 
+                       (set-front-ptr! new-pair)
+                       (set-rear-ptr! new-pair)) 
+                      (else 
+                        (set-cdr! rear new-pair)
+                        (set-rear-ptr! new-pair))))) 
+        (define (delete-queue!) 
+            (cond ((empty-queue?) 
+                    (error "DELETE! called with an empty queue" front)) 
+                  (else 
+                    (set-front-ptr! (cdr front))))) 
+        (define (dispatch m) 
+            (cond ((eq? m 'insert-queue) insert-queue!) 
+                  ((eq? m 'delete-queue) delete-queue!) 
+                  ((eq? m 'front-queue) front-queue)
+                  ((eq? m 'empty-queue?) empty-queue?)
+                  (else (error "Undefined operation" m))))
+        dispatch))
